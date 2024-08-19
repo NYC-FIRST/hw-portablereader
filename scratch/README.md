@@ -18,3 +18,11 @@ They depend on software libraries for the following chips:
 The keyboard code was originally described in this calculator example here:
 
 [calc]
+
+Amazon links:
+
+[board]
+
+[lcd hat]
+
+[card reader]
