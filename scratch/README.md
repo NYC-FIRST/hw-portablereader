@@ -1,3 +1,14 @@
-https://github.com/NYC-FIRST/hw-portablereader/blob/main/scratch/DisplayCode.ino
+These are project files compiled with `Arduino`
 
-https://github.com/NYC-FIRST/hw-portablereader/blob/main/scratch/ScreenCode.ino
+https://www.arduino.cc/en/software
+
+They depend on software libraries for the following chips:
+
+[graphics]
+
+[card reader}
+
+--
+The keyboard code was originally described in this calculator example here:
+
+[calc]
