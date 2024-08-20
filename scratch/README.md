@@ -10,7 +10,7 @@ Datasheet:
 https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/DataSheets/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
   
   Card Reader:
-  (https://www.nxp.com/docs/en/data-sheet/MFRC522.pdf
+  https://www.nxp.com/docs/en/data-sheet/MFRC522.pdf
 
   
 They depend on software libraries for the following chips:
