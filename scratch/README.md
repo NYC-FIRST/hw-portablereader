@@ -1,14 +1,3 @@
-# Why don't you add ASCII Art?
-```plaintext
-_____.___.________      _________   ____
-\__  |   |\_____  \    /  _  \   \ /   /
- /   |   | /   |   \  /  /_\  \   Y   / 
- \____   |/    |    \/    |    \     /  
- / ______|\_______  /\____|__  /\___/   
- \/               \/         \/         
-```
-
-
 # Project Overview
 
 This repository contains project files developed using the Arduino platform, specifically compiled for the ATMEGA328P microcontroller.
