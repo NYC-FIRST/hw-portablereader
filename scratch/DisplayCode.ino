@@ -111,8 +111,9 @@ void ShowReaderDetails() {
   byte v = mfrc522.PCD_ReadRegister(mfrc522.VersionReg);
   Serial.print(F("MFRC522 Software Version: 0x"));
   Serial.print(v, HEX);
-  if (v == 0x91)
+  if (v == 0x91) {
     Serial.print(F(" = v1.0"));
+  }
   else if (v == 0x92)
     Serial.print(F(" = v2.0"));
   else
