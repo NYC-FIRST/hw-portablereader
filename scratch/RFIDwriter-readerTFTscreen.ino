@@ -80,8 +80,6 @@ byte writeBlockData[16]; // Buffer to hold data to be written
 bool isWriteMode = false;
 
 void setup() {
-  Serial.begin(9600); // Initialize serial monitor for RFID output
-  
   // Initialize LCD
   tft.reset(); // Always reset at start
   tft.begin(0x9341); // My LCD uses LIL9341 Interface driver IC
@@ -91,11 +89,8 @@ void setup() {
   draw_BoxNButtons(); 
   
   // Initialize RFID
-  while (!Serial);    // Do nothing if no serial port is opened (for ATMEGA32U4-based Arduinos)
   SPI.begin();        // Init SPI bus
   mfrc522.PCD_Init(); // Init MFRC522
-  ShowReaderDetails(); // Show details of PCD - MFRC522 Card Reader details
-  Serial.println(F("Scan PICC to read or write data to block 2..."));
 }
 
 void loop() {
@@ -107,7 +102,6 @@ void loop() {
     if (p == 'W') { // 'Wrt' button pressed, switch to write mode
       isWriteMode = true; // Switch to write mode
       DisplayResult(); // Update display with pink background
-      Serial.println(F("Write mode activated. Scan the card to write."));
       return;
     }
     if (p == 'R') { // "Rst" button pressed, clear the screen and reset the number
@@ -135,12 +129,6 @@ void loop() {
 
       case 'C':
         currentNumber = ""; Num1 = Num2 = 0;
-        break;
-
-      case '=':
-        Num2 = currentNumber.toInt();
-        CalculateResult(action);
-        currentNumber = String(Num1);  // Update the current number to the result
         break;
 
       default:
@@ -180,15 +168,6 @@ char checkTouch() {
   }
 
   return symbol[gridy][gridx][0];
-}
-
-void CalculateResult(int action) {
-  switch (action) {
-    case '+': Num1 = Num1 + Num2; break;
-    case '-': Num1 = Num1 - Num2; break;
-    case '*': Num1 = Num1 * Num2; break;
-    case '/': if (Num2 != 0) Num1 = Num1 / Num2; break;
-  }
 }
 
 void DisplayResult() {
@@ -233,10 +212,11 @@ void writeNumberToCard() {
     for (byte i = 0; i < 6; i++) key.keyByte[i] = 0xFF; // Default key is 0xFF for all bytes
 
     // Authenticate with the card
-    MFRC522::StatusCode status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, blockNum, &key, &(mfrc522.uid));
+    MFRC522::StatusCode status =
+              mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, blockNum, &key, &(mfrc522.uid));
     if (status != MFRC522::STATUS_OK) {
-      Serial.print(F("Authentication failed: "));
-      Serial.println(mfrc522.GetStatusCodeName(status));
+      // Serial.print(F("Authentication failed: "));
+      // Serial.println(mfrc522.GetStatusCodeName(status));
       mfrc522.PICC_HaltA();
       mfrc522.PCD_StopCrypto1(); // Stop encryption
       return;
@@ -245,14 +225,14 @@ void writeNumberToCard() {
     // Write data to the block
     status = mfrc522.MIFARE_Write(blockNum, writeBlockData, 16);
     if (status != MFRC522::STATUS_OK) {
-      Serial.print(F("Writing failed: "));
-      Serial.println(mfrc522.GetStatusCodeName(status));
+      // Serial.print(F("Writing failed: "));
+      // Serial.println(mfrc522.GetStatusCodeName(status));
       mfrc522.PICC_HaltA();
       mfrc522.PCD_StopCrypto1(); // Stop encryption
       return;
     }
 
-    Serial.println(F("Data written to the card successfully!"));
+    // Serial.println(F("Data written to the card successfully!"));
     isWriteMode = false; // Switch back to read mode after writing
     DisplayResult(); // Update display to cyan background
 
@@ -269,10 +249,11 @@ void readCardData() {
     for (byte i = 0; i < 6; i++) key.keyByte[i] = 0xFF; // Default key is 0xFF for all bytes
 
     // Authenticate with the card
-    MFRC522::StatusCode status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, blockNum, &key, &(mfrc522.uid));
+    MFRC522::StatusCode status =
+              mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, blockNum, &key, &(mfrc522.uid));
     if (status != MFRC522::STATUS_OK) {
-      Serial.print(F("Authentication failed: "));
-      Serial.println(mfrc522.GetStatusCodeName(status));
+      // Serial.print(F("Authentication failed: "));
+      // Serial.println(mfrc522.GetStatusCodeName(status));
       mfrc522.PICC_HaltA();
       mfrc522.PCD_StopCrypto1(); // Stop encryption
       return;
@@ -281,8 +262,8 @@ void readCardData() {
     // Read data from the block
     status = mfrc522.MIFARE_Read(blockNum, readBlockData, &bufferLen);
     if (status != MFRC522::STATUS_OK) {
-      Serial.print(F("Reading failed: "));
-      Serial.println(mfrc522.GetStatusCodeName(status));
+      // Serial.print(F("Reading failed: "));
+      // Serial.println(mfrc522.GetStatusCodeName(status));
       mfrc522.PICC_HaltA();
       mfrc522.PCD_StopCrypto1(); // Stop encryption
       return;
@@ -291,18 +272,9 @@ void readCardData() {
     // Display the read data on the TFT screen
     DisplayBlockData(readBlockData);
 
-    // Serial output for debugging
-    Serial.print("Block Data: ");
-    for (int i = 0; i < 16; i++) {
-      Serial.write(readBlockData[i]);
-    }
-    Serial.println();
-
     // Halt communication with the card and stop encryption
     mfrc522.PICC_HaltA();
     mfrc522.PCD_StopCrypto1(); // Stop encryption
-
-    // Ready for the next card
   }
 }
 
@@ -337,19 +309,3 @@ void draw_BoxNButtons() {
   }
 }
 
-void ShowReaderDetails() {
-  byte v = mfrc522.PCD_ReadRegister(mfrc522.VersionReg);
-  Serial.print(F("MFRC522 Software Version: 0x"));
-  Serial.print(v, HEX);
-  if (v == 0x91)
-    Serial.print(F(" = v1.0"));
-  else if (v == 0x92)
-    Serial.print(F(" = v2.0"));
-  else
-    Serial.print(F(" (unknown)"));
-  Serial.println("");
-
-  if (v == 0x00 || v == 0xFF) {
-    Serial.println(F("WARNING: Communication failure, is the MFRC522 properly connected?"));
-  }
-}
